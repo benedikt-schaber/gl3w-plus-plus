@@ -23,10 +23,23 @@ message(STATUS "Parsing glcorearb.h header...")
 
 file(STRINGS ${OUTDIR}/include/GL/glcorearb.h GLCOREARB)
 
+set(EXT_SUFFIXES ARB EXT KHR OVR NV AMD INTEL)
+function(is_ext PROC)
+  foreach(SUFFIX ${EXT_SUFFIXES})
+    if(${PROC} MATCHES "${SUFFIX}$")
+      set(I_E TRUE PARENT_SCOPE)
+    endif()
+  endforeach()
+endfunction()
+
 foreach(LINE ${GLCOREARB})
     string(REGEX MATCH "GLAPI.*APIENTRY[ ]+([a-zA-Z0-9_]+)" MATCHES ${LINE})
     if(MATCHES)
+      set(I_E)
+      is_ext(${CMAKE_MATCH_1})
+      if(NOT I_E)
         list(APPEND PROCS ${CMAKE_MATCH_1})
+      endif()
     endif()
 endforeach()
 
