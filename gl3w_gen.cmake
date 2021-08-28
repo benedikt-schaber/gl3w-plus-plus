@@ -49,18 +49,19 @@ endmacro()
 
 macro(getprocsignature PROC)
     string(SUBSTRING ${PROC} 2 -1 P_S)
-    set(P_S "gl3w${P_S}")
 endmacro()
 
 message(STATUS "Generating gl3w.h in include/GL...")
 
 set(HDR_OUT ${OUTDIR}/include/GL/gl3w.h)
 
-set(EXTERNS "")
+list(LENGTH PROCS PROCS_LEN)
+
+set(INTERNALS "")
 foreach(PROC ${PROCS})
     getprocsignature(${PROC})
     getproctype_aligned(${PROC})
-    string(APPEND EXTERNS "extern ${P_T} ${P_S};\n")
+    string(APPEND INTERNALS "\t\t${P_T} ${P_S};\n")
 endforeach()
 
 set(DEFINES "")
@@ -69,7 +70,7 @@ foreach(PROC ${PROCS})
     string(LENGTH ${PROC} LEN)
     math(EXPR LEN "48 - ${LEN}")
     string(SUBSTRING ${SPACES} 0 ${LEN} PAD)
-    string(APPEND DEFINES "#define ${PROC}${PAD} gl3w${P_S}\n")
+    string(APPEND DEFINES "#define ${PROC}${PAD} gl3wProcs.gl.${P_S}\n")
 endforeach()
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h ${HDR_OUT} )
@@ -77,18 +78,9 @@ configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h ${HDR_OUT} )
 message(STATUS "Generating gl3w.c in src...")
 set(SRC_OUT ${OUTDIR}/src/gl3w.c)
 
-set(DECLARATIONS "")
+set(PROC_NAMES "")
 foreach(PROC ${PROCS})
-    getprocsignature(${PROC})
-    getproctype_aligned(${PROC})
-    string(APPEND DECLARATIONS "${P_T} ${P_S};\n")
-endforeach()
-
-set(LOADS "")
-foreach(PROC ${PROCS})
-    getprocsignature(${PROC})
-    getproctype(${PROC})
-    string(APPEND LOADS "\t${P_S} = (${P_T})proc(\"${PROC}\");\n")
+    string(APPEND PROC_NAMES "\t\"${PROC}\",\n")
 endforeach()
 
 configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.c ${SRC_OUT})
