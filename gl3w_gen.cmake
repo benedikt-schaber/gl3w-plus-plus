@@ -11,9 +11,9 @@ function(gl3w_gen)
 cmake_parse_arguments(PARSE_ARGV 0 GL3W "" "OUTDIR" "")
 
 function(join_path ROOT APPEND OUT)
-  string(LENGTH ${ROOT} LAST)
+  string(LENGTH "${ROOT}" LAST)
   math(EXPR LAST "${LAST} - 1")
-  string(SUBSTRING ${ROOT} ${LAST} 1 RES)
+  string(SUBSTRING "${ROOT}" ${LAST} 1 RES)
   if(RES STREQUAL "/")
     set(${OUT} "${ROOT}${APPEND}" PARENT_SCOPE)
   else()
@@ -31,20 +31,20 @@ function(ensure_downloaded URL PATH)
 endfunction()
 
 if(NOT GL3W_OUTDIR)
-  set(GL3W_OUTDIR ${CMAKE_CURRENT_LIST_DIR})
+  set(GL3W_OUTDIR "${CMAKE_CURRENT_LIST_DIR}")
 endif()
 
-join_path(${GL3W_OUTDIR} include/GL INCLUDE_GL_DIR)
-join_path(${GL3W_OUTDIR} src SRC_DIR)
+join_path("${GL3W_OUTDIR}" include/GL INCLUDE_GL_DIR)
+join_path("${GL3W_OUTDIR}" src SRC_DIR)
 
-file(MAKE_DIRECTORY ${INCLUDE_GL_DIR})
-file(MAKE_DIRECTORY ${SRC_DIR})
+file(MAKE_DIRECTORY "${INCLUDE_GL_DIR}")
+file(MAKE_DIRECTORY "${SRC_DIR}")
 
 ensure_downloaded("https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h" "${INCLUDE_GL_DIR}/glcorearb.h")
 
 message(STATUS "Parsing glcorearb.h header...")
 
-file(STRINGS ${INCLUDE_GL_DIR}/glcorearb.h GLCOREARB)
+file(STRINGS "${INCLUDE_GL_DIR}/glcorearb.h" GLCOREARB)
 
 set(EXT_SUFFIXES ARB EXT KHR OVR NV AMD INTEL)
 function(is_ext PROC)
@@ -107,7 +107,7 @@ foreach(PROC ${PROCS})
     string(APPEND DEFINES "#define ${PROC}${PAD} gl3wProcs.gl.${P_S}\n")
 endforeach()
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h ${INCLUDE_GL_DIR}/gl3w.h)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h "${INCLUDE_GL_DIR}/gl3w.h")
 
 message(STATUS "Generating gl3w.c in src...")
 
@@ -116,7 +116,7 @@ foreach(PROC ${PROCS})
     string(APPEND PROC_NAMES "\t\"${PROC}\",\n")
 endforeach()
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.c ${SRC_DIR}/gl3w.c)
+configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.c "${SRC_DIR}/gl3w.c")
 
 endfunction()
 
