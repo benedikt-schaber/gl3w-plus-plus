@@ -144,7 +144,7 @@ Copyright
 OpenGL_ is a registered trademark of SGI_.
 
 .. _gl3w: https://github.com/skaslev/gl3w
-.. _gl3w++: https://github.com/benedikt-schaber/gl3w++
+.. _gl3w++: https://github.com/benedikt-schaber/gl3w-plus-plus
 .. _glXXw: https://github.com/paroj/glXXw
 .. _gl3w_gen.cmake:
    https://github.com/benedikt-schaber/gl3w++/blob/master/gl3w_gen.cmake
