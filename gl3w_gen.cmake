@@ -34,17 +34,19 @@ if(NOT GL3W_OUTDIR)
   set(GL3W_OUTDIR "${CMAKE_CURRENT_LIST_DIR}")
 endif()
 
-join_path("${GL3W_OUTDIR}" include/GL INCLUDE_GL_DIR)
+join_path("${GL3W_OUTDIR}" include INCLUDE_DIR)
 join_path("${GL3W_OUTDIR}" src SRC_DIR)
 
-file(MAKE_DIRECTORY "${INCLUDE_GL_DIR}")
+file(MAKE_DIRECTORY "${INCLUDE_DIR}/GL")
+file(MAKE_DIRECTORY "${INCLUDE_DIR}/KHR")
 file(MAKE_DIRECTORY "${SRC_DIR}")
 
-ensure_downloaded("https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h" "${INCLUDE_GL_DIR}/glcorearb.h")
+ensure_downloaded("https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h" "${INCLUDE_DIR}/GL/glcorearb.h")
+ensure_downloaded("https://www.khronos.org/registry/EGL/api/KHR/khrplatform.h" "${INCLUDE_DIR}/KHR/khrplatform.h")
 
 message(STATUS "Parsing glcorearb.h header...")
 
-file(STRINGS "${INCLUDE_GL_DIR}/glcorearb.h" GLCOREARB)
+file(STRINGS "${INCLUDE_DIR}/GL/glcorearb.h" GLCOREARB)
 
 set(EXT_SUFFIXES ARB EXT KHR OVR NV AMD INTEL)
 function(is_ext PROC)
@@ -107,7 +109,7 @@ foreach(PROC ${PROCS})
     string(APPEND DEFINES "#define ${PROC}${PAD} gl3wProcs.gl.${P_S}\n")
 endforeach()
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h "${INCLUDE_GL_DIR}/gl3w.h")
+configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h "${INCLUDE_DIR}/GL/gl3w.h")
 
 message(STATUS "Generating gl3w.c in src...")
 
