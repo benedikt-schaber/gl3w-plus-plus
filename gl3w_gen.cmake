@@ -10,25 +10,39 @@ function(gl3w_gen)
 
 cmake_parse_arguments(PARSE_ARGV 0 GL3W "" "OUTDIR" "")
 
+function(join_path ROOT APPEND OUT)
+  string(LENGTH ${ROOT} LAST)
+  math(EXPR LAST "${LAST} - 1")
+  string(SUBSTRING ${ROOT} ${LAST} 1 RES)
+  if(RES STREQUAL "/")
+    set(${OUT} "${ROOT}${APPEND}" PARENT_SCOPE)
+  else()
+    set(${OUT} "${ROOT}/${APPEND}" PARENT_SCOPE)
+  endif()
+endfunction()
+
 if(NOT GL3W_OUTDIR)
   set(GL3W_OUTDIR ${CMAKE_CURRENT_LIST_DIR})
 endif()
 
-file(MAKE_DIRECTORY ${GL3W_OUTDIR}/include/GL)
-file(MAKE_DIRECTORY ${GL3W_OUTDIR}/src)
+join_path(${GL3W_OUTDIR} include/GL INCLUDE_GL_DIR)
+join_path(${GL3W_OUTDIR} src SRC_DIR)
 
-if(NOT EXISTS ${GL3W_OUTDIR}/include/GL/glcorearb.h)
+file(MAKE_DIRECTORY ${INCLUDE_GL_DIR})
+file(MAKE_DIRECTORY ${SRC_DIR})
+
+if(NOT EXISTS ${INCLUDE_GL_DIR}/glcorearb.h)
     message(STATUS "Downloading glcorearb.h to include/GL...")
     file(DOWNLOAD
         https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h
-        ${GL3W_OUTDIR}/include/GL/glcorearb.h)
+        ${INCLUDE_GL_DIR}/glcorearb.h)
 else()
     message(STATUS "Reusing glcorearb.h from include/GL...")
 endif()
 
 message(STATUS "Parsing glcorearb.h header...")
 
-file(STRINGS ${GL3W_OUTDIR}/include/GL/glcorearb.h GLCOREARB)
+file(STRINGS ${INCLUDE_GL_DIR}/glcorearb.h GLCOREARB)
 
 set(EXT_SUFFIXES ARB EXT KHR OVR NV AMD INTEL)
 function(is_ext PROC)
@@ -73,8 +87,6 @@ endmacro()
 
 message(STATUS "Generating gl3w.h in include/GL...")
 
-set(HDR_OUT ${GL3W_OUTDIR}/include/GL/gl3w.h)
-
 list(LENGTH PROCS PROCS_LEN)
 
 set(INTERNALS "")
@@ -93,17 +105,16 @@ foreach(PROC ${PROCS})
     string(APPEND DEFINES "#define ${PROC}${PAD} gl3wProcs.gl.${P_S}\n")
 endforeach()
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h ${HDR_OUT} )
+configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h ${INCLUDE_GL_DIR}/gl3w.h)
 
 message(STATUS "Generating gl3w.c in src...")
-set(SRC_OUT ${GL3W_OUTDIR}/src/gl3w.c)
 
 set(PROC_NAMES "")
 foreach(PROC ${PROCS})
     string(APPEND PROC_NAMES "\t\"${PROC}\",\n")
 endforeach()
 
-configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.c ${SRC_OUT})
+configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.c ${SRC_DIR}/gl3w.c)
 
 endfunction()
 
