@@ -5,23 +5,30 @@
 # - from a cmake project: include(gl3w_gen) then gl3w_gen(OUTPUT_PATH)
 # Pavel Rojtberg 2016
 
-function(gl3w_gen OUTDIR)
+# gl3w_gen([OUTDIR dir])
+function(gl3w_gen)
 
-file(MAKE_DIRECTORY ${OUTDIR}/include/GL)
-file(MAKE_DIRECTORY ${OUTDIR}/src)
+cmake_parse_arguments(PARSE_ARGV 0 GL3W "" "OUTDIR" "")
 
-if(NOT EXISTS ${OUTDIR}/include/GL/glcorearb.h)
+if(NOT GL3W_OUTDIR)
+  set(GL3W_OUTDIR ${CMAKE_CURRENT_LIST_DIR})
+endif()
+
+file(MAKE_DIRECTORY ${GL3W_OUTDIR}/include/GL)
+file(MAKE_DIRECTORY ${GL3W_OUTDIR}/src)
+
+if(NOT EXISTS ${GL3W_OUTDIR}/include/GL/glcorearb.h)
     message(STATUS "Downloading glcorearb.h to include/GL...")
     file(DOWNLOAD
         https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h
-        ${OUTDIR}/include/GL/glcorearb.h)
+        ${GL3W_OUTDIR}/include/GL/glcorearb.h)
 else()
     message(STATUS "Reusing glcorearb.h from include/GL...")
 endif()
 
 message(STATUS "Parsing glcorearb.h header...")
 
-file(STRINGS ${OUTDIR}/include/GL/glcorearb.h GLCOREARB)
+file(STRINGS ${GL3W_OUTDIR}/include/GL/glcorearb.h GLCOREARB)
 
 set(EXT_SUFFIXES ARB EXT KHR OVR NV AMD INTEL)
 function(is_ext PROC)
@@ -66,7 +73,7 @@ endmacro()
 
 message(STATUS "Generating gl3w.h in include/GL...")
 
-set(HDR_OUT ${OUTDIR}/include/GL/gl3w.h)
+set(HDR_OUT ${GL3W_OUTDIR}/include/GL/gl3w.h)
 
 list(LENGTH PROCS PROCS_LEN)
 
@@ -89,7 +96,7 @@ endforeach()
 configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.h ${HDR_OUT} )
 
 message(STATUS "Generating gl3w.c in src...")
-set(SRC_OUT ${OUTDIR}/src/gl3w.c)
+set(SRC_OUT ${GL3W_OUTDIR}/src/gl3w.c)
 
 set(PROC_NAMES "")
 foreach(PROC ${PROCS})
