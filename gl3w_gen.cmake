@@ -21,6 +21,15 @@ function(join_path ROOT APPEND OUT)
   endif()
 endfunction()
 
+function(ensure_downloaded URL PATH)
+  if(NOT EXISTS "${PATH}")
+    message(STATUS "Downloading ${PATH}...")
+    file(DOWNLOAD "${URL}" "${PATH}")
+  else()
+    message(STATUS "Reusing ${PATH}...")
+  endif()
+endfunction()
+
 if(NOT GL3W_OUTDIR)
   set(GL3W_OUTDIR ${CMAKE_CURRENT_LIST_DIR})
 endif()
@@ -31,14 +40,7 @@ join_path(${GL3W_OUTDIR} src SRC_DIR)
 file(MAKE_DIRECTORY ${INCLUDE_GL_DIR})
 file(MAKE_DIRECTORY ${SRC_DIR})
 
-if(NOT EXISTS ${INCLUDE_GL_DIR}/glcorearb.h)
-    message(STATUS "Downloading glcorearb.h to include/GL...")
-    file(DOWNLOAD
-        https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h
-        ${INCLUDE_GL_DIR}/glcorearb.h)
-else()
-    message(STATUS "Reusing glcorearb.h from include/GL...")
-endif()
+ensure_downloaded("https://www.khronos.org/registry/OpenGL/api/GL/glcorearb.h" "${INCLUDE_GL_DIR}/glcorearb.h")
 
 message(STATUS "Parsing glcorearb.h header...")
 
