@@ -5,10 +5,10 @@
 # - from a cmake project: include(gl3w_gen) then gl3w_gen(OUTPUT_PATH)
 # Pavel Rojtberg 2016
 
-# gl3w_gen([OUTDIR dir])
+# gl3w_gen([OUTDIR dir] [GET_EXTENSIONS])
 function(gl3w_gen)
 
-cmake_parse_arguments(PARSE_ARGV 0 GL3W "" "OUTDIR" "")
+cmake_parse_arguments(PARSE_ARGV 0 GL3W "GET_EXTENSIONS" "OUTDIR" "")
 
 function(join_path ROOT APPEND OUT)
   string(LENGTH "${ROOT}" LAST)
@@ -60,7 +60,7 @@ foreach(LINE ${GLCOREARB})
     if(MATCHES)
       set(I_E)
       is_ext(${CMAKE_MATCH_1})
-      if(NOT I_E)
+      if(GL3W_GET_EXTENSIONS OR (NOT I_E))
         list(APPEND PROCS ${CMAKE_MATCH_1})
       endif()
     endif()
