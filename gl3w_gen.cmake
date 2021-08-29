@@ -121,5 +121,5 @@ configure_file(${CMAKE_CURRENT_LIST_DIR}/gl3w.in.c "${SRC_DIR}/gl3w.c")
 endfunction()
 
 if(NOT CMAKE_PROJECT_NAME)
-    gl3w_gen(".")
+    gl3w_gen(OUTDIR ".")
 endif()
