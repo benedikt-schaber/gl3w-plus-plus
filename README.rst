@@ -37,9 +37,11 @@ It can both be used stand-alone::
 
    cmake -P gl3w_gen.cmake
 
-As well as from any CMake file::
+As well as from any CMake file by including the gl3w_gen.cmake file and calling
+the provided function::
 
-   include(<Path to this directory>/gl3w_gen.cmake)
+   LIST(APPEND CMAKE_MODULE_PATH "<path to this directory>")
+   include(gl3w_gen)
    gl3w_gen([OUTDIR <dir>] [GET_EXTENSIONS])
 
 Example

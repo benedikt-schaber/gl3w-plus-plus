@@ -2,7 +2,10 @@
 
 # Usage:
 # - cmake script mode: cmake -P gl3w_gen.cmake or ./gl3w_gen.cmake
-# - from a cmake project: include(<path>/gl3w_gen) then gl3w_gen([OUTDIR <dir>] [GET_EXTENSIONS])
+# - from a cmake project:
+#   LIST(APPEND CMAKE_MODULE_PATH "<path to this directory>")
+#   include(gl3w_gen)
+#   gl3w_gen([OUTDIR <dir>] [GET_EXTENSIONS])
 # Benedikt Schaber 2021, Pavel Rojtberg 2016
 
 # gl3w_gen([OUTDIR dir] [GET_EXTENSIONS])
